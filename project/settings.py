@@ -26,14 +26,14 @@ SECRET_KEY = 'django-insecure--$v7_sq7)6y#1)uv-hchc5s)d5hm=*oygs(-%k9a2dzm$qma6f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['.vercel.app','now.sh','127.0.0.1','localhost'] # Allow *.vercel.app
+ALLOWED_HOSTS = ['*']
+
 
 # Application definition
 
 INSTALLED_APPS = [
     'jazzmin',
-
+    'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -84,22 +84,13 @@ AUTH_USER_MODEL = 'userauths.User'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': 'fGBuYfCaXErZmqSxMRXEbBpPTThGaDcU',
-        'HOST': 'monorail.proxy.rlwy.net',
-        'PORT': '59963', 
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',  # Assuming db.sqlite3 is in your project directory
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

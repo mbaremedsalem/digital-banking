@@ -60,26 +60,7 @@ class MyRegisterView(APIView):
 
         print("Serializer errors:", serializer.errors)  # Debugging statement
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#------ my logout -----
-# class MyLogoutView(APIView):
-#     permission_classes = (IsAuthenticated)
-#     def post(self, request):
-#         auth_header = request.headers.get('Authorization')
-#         if auth_header:
-#             try:
-#                 # Expecting the header format: "Bearer <token>"
-#                 token_type, token = auth_header.split()
-#                 if token_type.lower() == 'Bearer':
-#                     refresh_token = token
-#                     token = RefreshToken(refresh_token)
-#                     token.blacklist()
-#                     return Response({"detail": "Successfully logged out."}, status=status.HTTP_205_RESET_CONTENT)
-#                 else:
-#                     return Response({"error": "Invalid token type."}, status=status.HTTP_400_BAD_REQUEST)
-#             except Exception as e:
-#                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             return Response({"error": "Authorization header not provided."}, status=status.HTTP_400_BAD_REQUEST)
+
 class MyLogoutView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
