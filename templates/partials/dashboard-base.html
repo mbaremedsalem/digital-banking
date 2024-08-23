@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Paylio - Money Transfer and Online Payments Dashboard HTML Template</title>
+    <title>PoolPay - Money Transfer and Online Payments</title>
 
     <link rel="shortcut icon" href="{% static 'assets11/images/fav.png' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'assets1/css/bootstrap.min.css' %}">
@@ -76,22 +76,22 @@
                                                 <div class="text-area">
                                                     
                                                     {% if n.notification_type == "Credit Alert" %}
-                                                    <p class="mdr">You received a payment of <b>${{n.amount}}</b></p>
+                                                    <p class="mdr">You received a payment of <b>MRU{{n.amount}}</b></p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Debit Alert" %}
-                                                    <p class="mdr">You sent a payment of <b>${{n.amount}}</b></p>
+                                                    <p class="mdr">You sent a payment of <b>MRU{{n.amount}}</b></p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Sent Payment Request" %}
-                                                    <p class="mdr">You sent a <b>payment request</b> of <b>${{n.amount}}</b></p>
+                                                    <p class="mdr">You sent a <b>payment request</b> of <b>MRU{{n.amount}}</b></p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Recieved Payment Request" %}
-                                                    <p class="mdr">You received a <b>payment request</b> of <b>${{n.amount}}</b></p>
+                                                    <p class="mdr">You received a <b>payment request</b> of <b>MRU{{n.amount}}</b></p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Funded Credit Card" %}
-                                                    <p class="mdr">You funded your credit card with <b>${{n.amount}}</b></p>
+                                                    <p class="mdr">You funded your credit card with <b>MRU{{n.amount}}</b></p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Withdrew Credit Card Funds" %}
-                                                    <p class="mdr">You withdrew <b>${{n.amount}}</b> from your credit card</p>
+                                                    <p class="mdr">You withdrew <b>MRU{{n.amount}}</b> from your credit card</p>
                                                     {% endif %}
                                                     {% if n.notification_type == "Deleted Credit Card" %}
                                                     <p class="mdr">You deleted your credit card</p>
@@ -205,7 +205,7 @@
                             <i class="fa-solid fa-xmark"></i>
                         </div>
                         <div class="sidebar-logo">
-                            <a href="{% url 'account:dashboard' %}"><img src="{% static 'assets1/images/logo.png' %}" alt="logo"></a>
+                            <a href="{% url 'account:dashboard' %}"><img src="{% static 'assets1/images/logo.png' %}" width="100px" alt="logo"></a>
                         </div>
                         <ul>
                             <li>
@@ -244,7 +244,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="deposit-money.html">
+                                <a href="{% url 'core:deposit_1' %}">
                                     <img src="{% static 'assets1/images/icon/deposit.png' %}" alt="Deposit"> <span>Deposit Money</span>
                                 </a>
                             </li>
@@ -276,7 +276,7 @@
                                 <div class="img-area">
                                     <img src="{% static 'assets1/images/invite-now-illus.png' %}" alt="Image">
                                 </div>
-                                <p>Invite your friend and get $25</p>
+                                <p>Invite your friend and get MRU 25</p>
                                 <a href="javascript:void(0)" class="cmn-btn">Invite Now</a>
                             </div>
                         </div>

@@ -24,7 +24,7 @@
                                     <p class="xlr">Quickly and easily send, receive and request money online with Paylio. Get a customised solution to fit your business needs.</p>
                                 </div>
                                 <div class="bottom-area d-xxl-flex">
-                                    <a href="sign-up.html" class="cmn-btn">Open a Free Account</a>
+                                    <a href="{% url 'userauths:sign-up' %}" class="cmn-btn">Open a Free Account</a> 
                                     <a class="cmn-btn active mfp-iframe popupvideo" href="https://www.youtube.com/watch?v=Djz8Nc0Qxwk">See How it Works</a>
                                 </div>
                             </div>
@@ -39,6 +39,7 @@
                                         </div>
                                         <div class="right-side">
                                             <select>
+                                                <option value="1">MRU</option>
                                                 <option value="1">USD</option>
                                                 <option value="2">GBP</option>
                                                 <option value="3">AUS</option>
@@ -54,7 +55,7 @@
                                             <div class="single-area d-flex align-items-center">
                                                 <div class="left-area">
                                                     <i class="fas fa-minus"></i>
-                                                    <span class="mdr">10.04 USD</span>
+                                                    <span class="mdr">10.04 MRU</span>
                                                 </div>
                                                 <div class="right-area">
                                                     <span class="mdr">Our fee</span>
@@ -63,7 +64,7 @@
                                             <div class="single-area d-flex align-items-center">
                                                 <div class="left-area">
                                                     <i class="fas fa-equals"></i>
-                                                    <span class="mdr">989.96 USD</span>
+                                                    <span class="mdr">989.96 MRU</span>
                                                 </div>
                                                 <div class="right-area">
                                                     <span class="mdr">We’ll Convert</span>
@@ -87,6 +88,7 @@
                                         </div>
                                         <div class="right-side recipient">
                                             <select>
+                                                <option value="1">MRU</option>
                                                 <option value="1">AUS</option>
                                                 <option value="2">USD</option>
                                                 <option value="3">GBP</option>

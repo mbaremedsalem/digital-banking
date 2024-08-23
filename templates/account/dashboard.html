@@ -22,7 +22,7 @@
                                         <h2>{{account.account_balance|intcomma}}MRU</h2>
                                         
                                         {% for recent_recieved_transfer in recent_recieved_transfer %}
-                                        <h5 class="receive">Last Received <span>${{recent_recieved_transfer.amount|intcomma}}</span></h5>
+                                        <h5 class="receive">Last Received <span>MRU{{recent_recieved_transfer.amount|intcomma}}</span></h5>
                                             
                                         {% endfor %}
                                             
@@ -31,8 +31,8 @@
                                         <div class="right-top">
                                             <select>
                                                 <option value="1">MRU </option>
-                                                <option value="2">US Dollar</option>
-                                                <option value="3">US Dollar</option>
+                                                <option value="2">US </option>
+                                                <option value="3">US </option>
                                             </select>
                                             <div class="dropdown-area">
                                                 <button type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -47,7 +47,7 @@
                                         <div class="right-bottom">
                                             
                                             {% for recent_transfer in recent_transfer %}
-                                                <h4><small>${{recent_transfer.amount|intcomma}}</small></h4>
+                                                <h4><small>MRU{{recent_transfer.amount|intcomma}}</small></h4>
                                             {% endfor %}
                                             <h5><small>Recent Transfer</small></h5>
                                         </div>

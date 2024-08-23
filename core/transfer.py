@@ -170,8 +170,11 @@ class TransferCompletedApi(APIView):
         return Response({
             "account": account_serializer.data,
             "transaction": transaction_serializer.data
-        }, status=status.HTTP_200_OK)
-    
+        }, 
+        status=status.HTTP_200_OK
+        )
+
+# ----- gjango ------    
 @login_required
 def search_users_account_number(request):
     # account = Account.objects.filter(account_status="active")

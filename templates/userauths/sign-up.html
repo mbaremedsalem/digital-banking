@@ -22,6 +22,7 @@
                         </div>
                         <form method="POST">
                             {% csrf_token %}
+                            
                             <div class="alert-danger alert">
                                 <!-- More robust error viewer -->
 
@@ -38,9 +39,10 @@
                                     <p> {{ form.errors }} </p>
                                 {% endif %} -->
                             </div>
+
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="single-input">
+                                    <div class="single-input" >
                                         {{form.username}}
                                     </div>
                                     <div class="single-input">
