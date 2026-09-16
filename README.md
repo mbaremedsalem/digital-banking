@@ -84,11 +84,18 @@ service web et la base PostgreSQL.
 |---|---|
 | Runtime | Python 3 |
 | Build Command | `./build.sh` |
-| Start Command | `gunicorn project.wsgi:application --log-file - --workers 2 --timeout 120` |
+| Start Command | `gunicorn project.wsgi:application --log-file - --timeout 120` |
 | Health Check Path | `/api/schema/` |
 
 Ajouter ensuite une base PostgreSQL Render et lier sa `DATABASE_URL` au service,
 puis renseigner les variables du tableau ci-dessus.
+
+> **Attention** : un service créé manuellement **ignore `render.yaml`**. Si le
+> Start Command est laissé vide, Render devine `gunicorn app:app` et le
+> déploiement échoue avec `ModuleNotFoundError: No module named 'app'`. De même,
+> si le Build Command n'est pas `./build.sh`, ni `collectstatic` ni `migrate` ne
+> sont exécutés et la base reste vide. Ces deux champs se trouvent dans
+> **Settings → Build & Deploy**.
 
 ### Ce que fait `build.sh`
 

@@ -15,7 +15,7 @@ services:
     region: frankfurt
     branch: main
     buildCommand: "./build.sh"
-    startCommand: "gunicorn project.wsgi:application --log-file - --workers 2 --timeout 120"
+    startCommand: "gunicorn project.wsgi:application --log-file - --timeout 120"
     healthCheckPath: /api/schema/
     envVars:
       - key: PYTHON_VERSION
