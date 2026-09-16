@@ -429,8 +429,11 @@ SIMPLE_JWT = {
 # (ex. CORS_ALLOWED_ORIGINS="https://poolpay.onrender.com,https://app.exemple.com").
 CORS_ALLOWED_ORIGINS = env_list(
     "CORS_ALLOWED_ORIGINS",
+    # Fronts locaux : indispensables car .env pointe vers le backend deploye,
+    # donc "npm run dev" appelle la production depuis localhost.
     "http://localhost:5173,http://127.0.0.1:5173,"
     "http://localhost:4173,http://127.0.0.1:4173,"
+    # Frontend en ligne.
     "https://frontend-digital-banking.vercel.app",
 )
 CORS_ALLOW_CREDENTIALS = True
