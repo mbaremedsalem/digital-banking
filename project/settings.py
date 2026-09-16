@@ -14,21 +14,41 @@ from pathlib import Path
 import os
 from datetime import timedelta
 import dj_database_url
-import django_heroku
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+# ---------------------------------------------------------------------------
+# Configuration pilotee par l'environnement (dev local vs Render)
+# ---------------------------------------------------------------------------
+def env_bool(name, default=False):
+    return os.environ.get(name, str(default)).strip().lower() in ("1", "true", "yes", "on")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--$v7_sq7)6y#1)uv-hchc5s)d5hm=*oygs(-%k9a2dzm$qma6f'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+def env_list(name, default=""):
+    return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
 
-ALLOWED_HOSTS = ['*']
+
+# SECURITY WARNING: en production, DJANGO_SECRET_KEY est obligatoire.
+# La valeur de repli ne sert qu'au developpement local.
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-dev-only--$v7_sq7)6y#1)uv-hchc5s)d5hm=*oygs(-%k9a2dzm$qma6f",
+)
+
+# DEBUG est desactive par defaut : il faut le demander explicitement en local.
+DEBUG = env_bool("DJANGO_DEBUG", True if os.environ.get("RENDER") is None else False)
+
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,.onrender.com")
+
+# Render expose le hostname public du service dans cette variable.
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+if DEBUG:
+    ALLOWED_HOSTS.append("*")
 
 
 # Application definition
@@ -89,12 +109,15 @@ AUTH_USER_MODEL = 'userauths.User'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# En local : SQLite. Sur Render : la variable DATABASE_URL du service Postgres.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',  # Assuming db.sqlite3 is in your project directory
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        ssl_require=bool(os.environ.get("DATABASE_URL")) and not DEBUG,
+    )
 }
+
 
 # DATABASES = {
 #    'default': {
@@ -148,7 +171,16 @@ LOGOUT_REDIRECT_URL = "userauths:sign-in"
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Django 5 : la configuration des stockages passe par STORAGES.
+# Le backend statique tolere les references cassees (voir project/storage.py).
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "project.storage.ForgivingManifestStaticFilesStorage",
+    },
+}
 
 # STATIC_URL = '/static/'
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'assets')]
@@ -158,8 +190,22 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Activate Django-Heroku.
-django_heroku.settings(locals())
+# ---------------------------------------------------------------------------
+# Durcissement applique uniquement hors DEBUG (donc en production)
+# ---------------------------------------------------------------------------
+if not DEBUG:
+    # Render termine le TLS en amont : sans cet en-tete Django croit etre en HTTP.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.environ.get("DJANGO_HSTS_SECONDS", "31536000"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -367,18 +413,21 @@ SIMPLE_JWT = {
 # ---------------------------------------------------------------------------
 # CORS : autorise le frontend React (Vite) a appeler l'API depuis un autre port
 # ---------------------------------------------------------------------------
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:4173",
-    "http://127.0.0.1:4173",
-]
+# Origines autorisees : les fronts locaux + celles fournies par l'environnement
+# (ex. CORS_ALLOWED_ORIGINS="https://poolpay.onrender.com,https://app.exemple.com").
+CORS_ALLOWED_ORIGINS = env_list(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173",
+)
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
+CSRF_TRUSTED_ORIGINS = env_list(
+    "CSRF_TRUSTED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173",
+) + ["https://*.onrender.com"]
+
+if RENDER_EXTERNAL_HOSTNAME:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
 
 # En developpement, Vite peut basculer sur un autre port (5174, 5175...) :
 # on autorise donc n'importe quel port local.

@@ -1,0 +1,60 @@
+# Blueprint Render — backend PoolPay (Django + PostgreSQL)
+# Deploiement : Render Dashboard > New > Blueprint > selectionner ce depot.
+
+databases:
+  - name: poolpay-db
+    databaseName: poolpay
+    user: poolpay
+    plan: free
+
+services:
+  - type: web
+    name: poolpay-api
+    runtime: python
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn project.wsgi:application --log-file - --workers 2 --timeout 120"
+    healthCheckPath: /api/schema/
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.3"
+
+      # Genere automatiquement par Render, jamais commite.
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+
+      - key: DJANGO_DEBUG
+        value: "False"
+
+      # Chaine de connexion fournie par la base ci-dessus.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: poolpay-db
+          property: connectionString
+
+      # Le hostname Render est ajoute automatiquement aux ALLOWED_HOSTS.
+      - key: DJANGO_ALLOWED_HOSTS
+        value: ".onrender.com"
+
+      # A remplacer par l'URL reelle du frontend une fois deploye.
+      - key: CORS_ALLOWED_ORIGINS
+        value: "http://localhost:5173"
+
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "http://localhost:5173"
+
+      # --- Service partenaire Agharina ---
+      - key: AGHARINA_API_URL
+        value: "https://admin-akarina.akarina.shop/api/biens"
+      - key: SERVICE_TAX_RATE
+        value: "0.02"
+
+      # Numeros des comptes de service : a renseigner APRES le premier deploiement,
+      # une fois les comptes crees sur la base de production
+      # (python manage.py creer_comptes_service).
+      - key: AGHARINA_ACCOUNT_NUMBER
+        sync: false
+      - key: POOLPAY_BANK_ACCOUNT_NUMBER
+        sync: false

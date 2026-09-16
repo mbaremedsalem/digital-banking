@@ -1,0 +1,52 @@
+# ---------------------------------------------------------------- Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+
+# ------------------------------------------------------- Environnements
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# ------------------------------------------------------------- Secrets
+.env
+.env.*
+!.env.example
+
+# ------------------------------------------------------------- Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+
+# Genere par collectstatic au deploiement
+staticfiles/
+
+# Fichiers televerses par les utilisateurs (disque ephemere sur Render)
+media/
+!media/.gitkeep
+
+# ------------------------------------------------------------- Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+node_modules/
+
+# ----------------------------------------------------------------- IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# ------------------------------------------------------------- Systeme
+.DS_Store
+Thumbs.db
+desktop.ini

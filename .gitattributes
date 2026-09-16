@@ -1,0 +1,23 @@
+# Normalisation des fins de ligne : LF dans le depot, quel que soit l'OS.
+* text=auto
+
+# Scripts et fichiers executes sous Linux (Render) : imperativement LF,
+# sinon le shebang devient "#!/usr/bin/env bash\r" et le build echoue.
+*.sh text eol=lf
+build.sh text eol=lf
+Procfile text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+# Binaires : aucune conversion.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.sqlite3 binary
