@@ -429,13 +429,16 @@ SIMPLE_JWT = {
 # (ex. CORS_ALLOWED_ORIGINS="https://poolpay.onrender.com,https://app.exemple.com").
 CORS_ALLOWED_ORIGINS = env_list(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173",
+    "http://localhost:5173,http://127.0.0.1:5173,"
+    "http://localhost:4173,http://127.0.0.1:4173,"
+    "https://frontend-digital-banking.vercel.app",
 )
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = env_list(
     "CSRF_TRUSTED_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173",
+    "http://localhost:5173,http://127.0.0.1:5173,"
+    "https://frontend-digital-banking.vercel.app",
 ) + ["https://*.onrender.com"]
 
 if RENDER_EXTERNAL_HOSTNAME:
@@ -447,7 +450,12 @@ if RENDER_EXTERNAL_HOSTNAME:
 # Utile pour les deploiements de previsualisation Vercel, dont l'URL change a
 # chaque commit. Exemple, en restreignant bien a VOTRE projet :
 #   CORS_ALLOWED_ORIGIN_REGEXES="^https://poolpay-.*[.]vercel[.]app$"
-CORS_ALLOWED_ORIGIN_REGEXES = env_list("CORS_ALLOWED_ORIGIN_REGEXES")
+# Par defaut : les deploiements de previsualisation de CE projet Vercel,
+# dont l'URL change a chaque commit. Restreint au prefixe du projet.
+CORS_ALLOWED_ORIGIN_REGEXES = env_list(
+    "CORS_ALLOWED_ORIGIN_REGEXES",
+    r"^https://frontend-digital-banking-.*[.]vercel[.]app$",
+)
 
 if DEBUG:
     # En local, Vite peut basculer sur un autre port (5174, 5175...).

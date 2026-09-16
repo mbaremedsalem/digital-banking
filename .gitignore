@@ -37,6 +37,8 @@ frontend/node_modules/
 frontend/dist/
 frontend/.env
 frontend/.env.local
+# L'URL publique du backend est versionnee pour que le build Vercel soit autonome.
+!frontend/.env.production
 node_modules/
 
 # ----------------------------------------------------------------- IDE
