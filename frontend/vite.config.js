@@ -1,17 +1,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// L'URL de l'API vient de VITE_API_URL (voir .env / .env.example).
+// Les appels sont cross-origin : c'est le backend qui les autorise via
+// CORS_ALLOWED_ORIGINS, aucun proxy n'est donc necessaire.
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    // Proxy optionnel : permet d'appeler l'API en same-origin (/proxy/...) si besoin.
-    proxy: {
-      '/django-media': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-        rewrite: (p) => p.replace(/^\/django-media/, '/media'),
-      },
-    },
+  },
+  build: {
+    outDir: 'dist',
+    // Pas de sourcemaps en production : le code metier bancaire n'a pas a
+    // etre lisible tel quel dans le navigateur.
+    sourcemap: false,
   },
 })

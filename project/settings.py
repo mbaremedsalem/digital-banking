@@ -443,8 +443,15 @@ if RENDER_EXTERNAL_HOSTNAME:
 
 # En developpement, Vite peut basculer sur un autre port (5174, 5175...) :
 # on autorise donc n'importe quel port local.
+# Motifs d'origines autorisees, en plus de la liste exacte ci-dessus.
+# Utile pour les deploiements de previsualisation Vercel, dont l'URL change a
+# chaque commit. Exemple, en restreignant bien a VOTRE projet :
+#   CORS_ALLOWED_ORIGIN_REGEXES="^https://poolpay-.*[.]vercel[.]app$"
+CORS_ALLOWED_ORIGIN_REGEXES = env_list("CORS_ALLOWED_ORIGIN_REGEXES")
+
 if DEBUG:
-    CORS_ALLOWED_ORIGIN_REGEXES = [
+    # En local, Vite peut basculer sur un autre port (5174, 5175...).
+    CORS_ALLOWED_ORIGIN_REGEXES += [
         r"^http://localhost:[0-9]+$",
         r"^http://127[.]0[.]0[.]1:[0-9]+$",
     ]

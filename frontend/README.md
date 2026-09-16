@@ -23,6 +23,55 @@ VITE_API_URL=http://127.0.0.1:8000
 
 Build de production : `npm run build` (sortie dans `dist/`), prévisualisation : `npm run preview`.
 
+## Déploiement sur Vercel
+
+Le dossier contient un [`vercel.json`](vercel.json) : il réécrit toutes les URL
+vers `index.html` (sans quoi rafraîchir `/transactions` renvoie **404 NOT_FOUND**,
+Vercel cherchant un fichier à ce chemin) et pose les en-têtes de cache.
+
+### Réglages du projet Vercel
+
+| Réglage | Valeur |
+|---|---|
+| Root Directory | `frontend` |
+| Framework Preset | Vite |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
+
+### Variable d'environnement
+
+Dans Vercel → Settings → Environment Variables :
+
+```
+VITE_API_URL = https://votre-service.onrender.com
+```
+
+**Attention** : les variables `VITE_*` sont compilées dans le bundle au moment
+du build. Le fichier `.env` local n'est pas versionné, donc Vercel ne le voit
+pas : sans cette variable, l'application appellera `http://127.0.0.1:8000` et
+toutes les requêtes échoueront. Après toute modification de la variable, il faut
+**redéployer** pour qu'elle soit prise en compte.
+
+### Autoriser Vercel côté backend
+
+Le navigateur bloque les appels tant que le backend ne renvoie pas l'en-tête
+CORS correspondant. Sur Render → Environment :
+
+```
+CORS_ALLOWED_ORIGINS   = https://votre-app.vercel.app
+CSRF_TRUSTED_ORIGINS   = https://votre-app.vercel.app
+```
+
+Les déploiements de prévisualisation Vercel ont une URL différente à chaque
+commit. Pour les autoriser sans tout ouvrir, ajoutez un motif restreint à votre
+projet :
+
+```
+CORS_ALLOWED_ORIGIN_REGEXES = ^https://votre-app-.*[.]vercel[.]app$
+```
+
+---
+
 ## Architecture
 
 ```
