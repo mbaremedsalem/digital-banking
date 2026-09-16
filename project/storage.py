@@ -22,6 +22,19 @@ class ForgivingManifestStaticFilesStorage(CompressedManifestStaticFilesStorage):
     # au lieu de lever une exception a l'execution.
     manifest_strict = False
 
+    def hashed_name(self, name, content=None, filename=None):
+        """
+        Un fichier statique reference mais absent ne doit pas faire tomber la
+        page entiere. Django leve ici une ValueError : on retombe alors sur le
+        nom d'origine, ce qui donne un 404 sur cette ressource au lieu d'une
+        erreur 500 sur toute la vue.
+        """
+        try:
+            return super().hashed_name(name, content, filename)
+        except ValueError as exc:
+            logger.warning("Fichier statique introuvable, servi sans hash : %s (%s)", name, exc)
+            return name
+
     def post_process(self, paths, dry_run=False, **options):
         for name, hashed_name, processed in super().post_process(paths, dry_run, **options):
             if isinstance(processed, Exception):

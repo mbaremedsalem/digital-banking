@@ -1,0 +1,4 @@
+/* Personnalisations de l'interface d'administration (Jazzmin).
+   Reference par JAZZMIN_SETTINGS["custom_css"] dans project/settings.py.
+   Ce fichier doit exister : sans lui, le stockage statique de production
+   ne peut pas resoudre l'URL et l'admin renvoie une erreur 500. */
