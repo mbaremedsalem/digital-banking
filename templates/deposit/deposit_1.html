@@ -1,0 +1,266 @@
+<style>
+
+
+        .stepper {
+            width: 300px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #3532ad;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+        }
+
+        .line {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 2px;
+            height: 100%;
+            background-color: #3532ad;
+            z-index: 0;
+        }
+
+        .content {
+            margin-left: 40px;
+            display: none;
+        }
+
+        .step.active .circle {
+            background-color: #5cb85c;
+        }
+
+        .step.active .content {
+            display: block;
+        }
+
+        .step:last-child .line {
+            height: 0;
+        }
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+}
+
+.styled-button {
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #e7e7ff; /* Background color */
+    border: none;
+    border-radius: 8px; /* Rounded corners */
+    color: white;
+    padding: 10px 20px;
+    width: 300px;
+    height: 160px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: left;
+}
+
+.styled-button:hover {
+    /* background-color: #2b2791; Darker shade on hover */
+    border-color: #2b2791;
+}
+
+.image-container {
+    width: 50px;
+    height: 40px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-container img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; /* Circular image */
+    object-fit: cover; /* Ensures the image covers the container */
+}
+
+.styled-button span {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+
+
+</style>
+{% extends "partials/dashboard-base.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+
+
+
+<section class="dashboard-section body-collapse">
+    <div class="overlay pt-120">
+        <div class="container-fruid">
+            <div class="row">
+                <div class="col-xl-11 col-lg-11">
+                    <div class="section-content">
+                        <div class="transactions-popup">
+                            <div class="container-fruid">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div>
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header justify-content-between">
+                                                        <h5>Deposit Money</h5>
+                                                        <a href="#"><i class="material-symbols-outlined">arrow_back</i></a>
+                                                    </div>
+                                                    <div class="main-content">
+                                                        <div class="row">
+                                                            <div class="col-sm-5 text-center">
+                                                                <div class="icon-area">
+                                                                    <div class="stepper">
+                                                                        <div class="step active" data-step="1">
+                                                                            <div class="circle">1</div>
+                                                                            <div class="line"></div>
+                                                                            <div class="content">
+                                                                                <p>Choose Payments Method.</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="step" data-step="2">
+                                                                            <div class="circle">2</div>
+                                                                            <div class="line"></div>
+                                                                            <div class="content">
+                                                                                <p>Enter Details.</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="step" data-step="3">
+                                                                            <div class="circle">3</div>
+                                                                            <div class="line"></div>
+                                                                            <div class="content">
+                                                                                <p>Confirm Order.</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-7">
+                                                                <div class="right-area">
+                                                                    <h6>Transaction Details</h6>
+                                                                    <div class="button-container">
+                                                                        <button class="styled-button" data-target="1">
+                                                                            <div class="image-container">
+                                                                                <img src="{% static 'assets1/images/logo.png' %}" alt="Recipients">
+                                                                            </div>
+                                                                            <span>Cash Deposit</span>
+                                                                        </button>
+                                                                        <button class="styled-button" data-target="2">
+                                                                            <div class="image-container">
+                                                                                <img src="{% static 'assets1/images/icon/bank-account-icon.png' %}" alt="Recipients">
+                                                                            </div>
+                                                                            <span>Cheque Deposit</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="payment-info">
+                                                                        <div id="class1">Content for Step 1.</div>
+                                                                        <div id="class2" style="display: none;">                    
+                                                                        
+                                                                            <form action="" method="POST">
+                                                                                {% csrf_token %}
+                                                                                <div class="send-banance">
+                                                                                    <label for="description">Amount:</label>
+                                                                                    <div class="input-area">
+                                                                                        <input class="xxlr" placeholder="Enter Amount" type="number" name="amount-request" id="amount-request">
+                                                                                        
+                                                                                    </div>
+                                                                                    
+                                                                                </div>
+                                                                                <!-- Js -->
+                                                        
+                                                                                <div class="send-banance pt-0 mt-0">
+                                                                                    <label for="description">Description:</label>
+                                                                                    <textarea id="description" name="description" rows="5" placeholder="Entrez une description..."></textarea>
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="file-upload" class="file-label">Upload File:</label>
+                                                                                    <input type="file" id="file-upload" name="file-upload" class="file-input">
+                                                                                </div>
+                                                                                <div class="footer-area mt-40">
+                                                                                    <a href="{% url 'core:request-search-account' %}">Previous Step</a>
+                                                                                    <button type="submit" style="padding: 10px 30px; border-radius: 10px; background: rgb(98, 0, 255); color: #fff;" class="active">Next</button>
+                                                                                </div>
+                                                                            </form>
+                                                                    
+                                                                        </div>
+                                                                        <div id="class3" style="display: none;">Content for Step 3.</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const buttons = document.querySelectorAll('.button-container button');
+        const steps = document.querySelectorAll('.step');
+        const contents = document.querySelectorAll('.payment-info > div');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                const target = this.getAttribute('data-target');
+                
+                // Remove active class from all steps
+                steps.forEach(step => {
+                    step.classList.remove('active');
+                });
+
+                // Hide all content divs
+                contents.forEach(content => {
+                    content.style.display = 'none';
+                });
+
+                // Add active class to the current step
+                const currentStep = document.querySelector(`.step[data-step="${target}"]`);
+                if (currentStep) {
+                    currentStep.classList.add('active');
+                }
+
+                // Show the content of the current step
+                const currentContent = document.getElementById(`class${target}`);
+                if (currentContent) {
+                    currentContent.style.display = 'block';
+                }
+            });
+        });
+    });
+</script>
+{% endblock content %}
