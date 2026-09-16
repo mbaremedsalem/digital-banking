@@ -1,5 +1,5 @@
 from django.urls import path
-from core import deposit, views, transfer, transaction, payment_request, credit_card
+from core import deposit, views, transfer, transaction, payment_request, credit_card, withdrawal, services
 
 
 app_name = "core"
@@ -67,6 +67,20 @@ urlpatterns = [
     path('withdraw-fund-api/<str:card_id>/', credit_card.WithdrawFundApi.as_view(), name='withdraw-fund-api'),
     path('delete-card-api/<str:card_id>/', credit_card.DeleteCardApi.as_view(), name='delete-card-api'),
     
+    # -------- Retrait especes au guichet (API) --------
+    path("withdrawals-api/", withdrawal.WithdrawalListCreateApi.as_view(), name="withdrawals-api"),
+    path("withdrawal-api/<str:code>/", withdrawal.WithdrawalDetailApi.as_view(), name="withdrawal-api"),
+    path("withdrawal-cancel-api/<str:code>/", withdrawal.WithdrawalCancelApi.as_view(), name="withdrawal-cancel-api"),
+    path("withdrawals-pending-api/", withdrawal.PendingWithdrawalsApi.as_view(), name="withdrawals-pending-api"),
+    path("withdrawal-validate-api/<str:code>/", withdrawal.WithdrawalValidateApi.as_view(), name="withdrawal-validate-api"),
+
+    # -------- Paiement de services partenaires (Agharina) --------
+    path("agharina-biens-api/", services.AgharinaBienListApi.as_view(), name="agharina-biens-api"),
+    path("agharina-bien-api/<str:reference>/", services.AgharinaBienDetailApi.as_view(), name="agharina-bien-api"),
+    path("agharina-pay-api/<str:reference>/", services.AgharinaPayApi.as_view(), name="agharina-pay-api"),
+    path("service-payments-api/", services.ServicePaymentListApi.as_view(), name="service-payments-api"),
+    path("service-payment-api/<str:payment_id>/", services.ServicePaymentDetailApi.as_view(), name="service-payment-api"),
+
     # -------------- deposite ----------
     path("deposit_1/", deposit.deposit_1, name="deposit_1"),
 ]

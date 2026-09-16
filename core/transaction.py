@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 #------- api --------
 class TransactionListApi(APIView):
@@ -26,11 +27,28 @@ class TransactionListApi(APIView):
         request_sender_transactions_serializer = TransactionSerializer(request_sender_transactions, many=True)
         request_reciever_transactions_serializer = TransactionSerializer(request_reciever_transactions, many=True)
 
+        # Les retraits especes au guichet : le client en est l'emetteur,
+        # l'agent de caisse le destinataire.
+        withdraw_transactions = Transaction.objects.filter(
+            Q(sender=request.user) | Q(reciever=request.user),
+            transaction_type="withdraw",
+        ).order_by("-id")
+        withdraw_transactions_serializer = TransactionSerializer(withdraw_transactions, many=True)
+
+        # Paiements de services partenaires et taxes associees.
+        service_transactions = Transaction.objects.filter(
+            Q(sender=request.user) | Q(reciever=request.user),
+            transaction_type__in=["payment", "fee"],
+        ).order_by("-id")
+        service_transactions_serializer = TransactionSerializer(service_transactions, many=True)
+
         return Response({
             "sender_transactions": sender_transactions_serializer.data,
             "reciever_transactions": reciever_transactions_serializer.data,
             "request_sender_transactions": request_sender_transactions_serializer.data,
-            "request_reciever_transactions": request_reciever_transactions_serializer.data
+            "request_reciever_transactions": request_reciever_transactions_serializer.data,
+            "withdraw_transactions": withdraw_transactions_serializer.data,
+            "service_transactions": service_transactions_serializer.data
         }, status=status.HTTP_200_OK)
 
 class TransactionDetailApi(APIView):

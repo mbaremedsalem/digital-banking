@@ -49,11 +49,13 @@ INSTALLED_APPS = [
     'account',
     'rest_framework',
     'rest_framework_simplejwt',
-    'drf_spectacular'  # new
+    'drf_spectacular',  # new
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -361,3 +363,44 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+# ---------------------------------------------------------------------------
+# CORS : autorise le frontend React (Vite) a appeler l'API depuis un autre port
+# ---------------------------------------------------------------------------
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+]
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+# En developpement, Vite peut basculer sur un autre port (5174, 5175...) :
+# on autorise donc n'importe quel port local.
+if DEBUG:
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r"^http://localhost:[0-9]+$",
+        r"^http://127[.]0[.]0[.]1:[0-9]+$",
+    ]
+
+# ---------------------------------------------------------------------------
+# Service "Paiement Agharina" (immobilier)
+# ---------------------------------------------------------------------------
+# API publique qui decrit les biens ; le backend la reinterroge lui-meme au
+# moment du paiement pour ne jamais faire confiance au prix envoye par le client.
+AGHARINA_API_URL = os.environ.get("AGHARINA_API_URL", "https://admin-akarina.akarina.shop/api/biens")
+AGHARINA_API_TIMEOUT = 20
+
+# Comptes de service PoolPay (modifiables : ce sont de vrais comptes clients).
+# - AGHARINA : recoit le montant du bien
+# - BANK     : recoit la taxe de service
+AGHARINA_ACCOUNT_NUMBER = os.environ.get("AGHARINA_ACCOUNT_NUMBER", "2172328718882")
+POOLPAY_BANK_ACCOUNT_NUMBER = os.environ.get("POOLPAY_BANK_ACCOUNT_NUMBER", "2171123705801")
+
+# Taxe de service prelevee en plus du prix du bien (2 %).
+SERVICE_TAX_RATE = os.environ.get("SERVICE_TAX_RATE", "0.02")

@@ -302,8 +302,13 @@ class SettlementProcessingApi(APIView):
         transaction.status = "request_settled"
         transaction.save()
 
+        # Tous les utilisateurs n'ont pas de dossier KYC : sans ce garde-fou
+        # l'API renvoyait une 500 alors que l'argent avait deja ete transfere.
+        kyc = getattr(account.user, "kyc", None)
+        beneficiaire = kyc.full_name if kyc else account.user.username
+
         return Response({
-            "detail": f"Settlement to {account.user.kyc.full_name} was successful.",
+            "detail": f"Settlement to {beneficiaire} was successful.",
             "account": AccountSerializer(account).data,
             "transaction": TransactionSerializer(transaction).data
         }, status=status.HTTP_200_OK)
@@ -369,7 +374,8 @@ def settlement_processing(request, account_number, transaction_id):
                 transaction.status = "request_settled"
                 transaction.save()
 
-                messages.success(request, f"Settled to {account.user.kyc.full_name} was successfull.")
+                kyc = getattr(account.user, "kyc", None)
+                messages.success(request, f"Settled to {kyc.full_name if kyc else account.user.username} was successfull.")
                 return redirect("core:settlement-completed", account.account_number, transaction.transaction_id)
 
         else:
