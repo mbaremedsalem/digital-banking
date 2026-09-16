@@ -1,10 +1,75 @@
+from django.conf import settings
 from django.urls import path
+
 from core import deposit, views, transfer, transaction, payment_request, credit_card, withdrawal, services
 
 
 app_name = "core"
 
-urlpatterns = [
+
+# ---------------------------------------------------------------------------
+# API REST : toujours active. C'est ce que consomme le frontend React.
+# ---------------------------------------------------------------------------
+api_patterns = [
+    # ---------- Transfers API ---------
+    path("search-account-api/", transfer.SearchUserAccountNumber.as_view(), name='search-account-api'),
+    path("amount-transfer-api/<str:account_number>/", transfer.AmountTransferApi.as_view(), name='amount-transfer-api'),
+    path('amount-transfer-process-api/<str:account_number>/', transfer.AmountTransferProcessApi.as_view(), name='amount-transfer-process-api'),
+    path('transfer-confirmation-api/<str:account_number>/<str:transaction_id>/', transfer.TransferConfirmationApi.as_view(), name='transfer-confirmation-api'),
+    path('transfer-process-api/<str:account_number>/<str:transaction_id>/', transfer.TransferProcessApi.as_view(), name='transfer-process-api'),
+    path('transfer-completed-api/<str:account_number>/<str:transaction_id>/', transfer.TransferCompletedApi.as_view(), name='transfer-completed-api'),
+
+    # ---------- transactions API ---------
+    path('transactions-api/', transaction.TransactionListApi.as_view(), name='transaction-api'),
+    path('transaction-detail-api/<str:transaction_id>/', transaction.TransactionDetailApi.as_view(), name='transaction-detail-api'),
+
+    # ---------- Payment API ---------
+    path("request-search-account-api/", payment_request.SearchUsersRequestApi.as_view(), name="request-search-account-api"),
+    path('amount-request-api/<str:account_number>/', payment_request.AmountRequestApi.as_view(), name='amount-request-api'),
+    path('amount-request-process-api/<str:account_number>/', payment_request.AmountRequestProcessApi.as_view(), name='amount-request-process-api'),
+    path('amount-request-confirmation-api/<str:account_number>/<str:transaction_id>/', payment_request.AmountRequestConfirmationApi.as_view(), name='amount-request-confirmation-api'),
+    path('amount-request-final-process-api/<str:account_number>/<str:transaction_id>/', payment_request.AmountRequestFinalProcessApi.as_view(), name='amount-request-final-process-api'),
+    path('request-completed-api/<str:account_number>/<str:transaction_id>/', payment_request.RequestCompletedApi.as_view(), name='request-completed-api'),
+
+    # ---------- Request Settlement API ---------
+    path('settlement-confirmation-api/<str:account_number>/<str:transaction_id>/', payment_request.SettlementConfirmationApi.as_view(), name='settlement-confirmation-api'),
+    path('settlement-processing-api/<str:account_number>/<str:transaction_id>/', payment_request.SettlementProcessingApi.as_view(), name='settlement-processing-api'),
+    path('settlement-completed-api/<str:account_number>/<str:transaction_id>/', payment_request.SettlementCompletedApi.as_view(), name='settlement-completed-api'),
+    path('delete-payment-request-api/<str:account_number>/<str:transaction_id>/', payment_request.DeletePaymentRequestApi.as_view(), name='delete-payment-request-api'),
+
+    # ---------- Credit Card API ---------
+    path('all-cards-api/', credit_card.AllCardsApi.as_view(), name='all-cards-api'),
+    path('card-api/<str:card_id>/', credit_card.CardDetailApi.as_view(), name='card-api'),
+    path('fund-credit-card-api/<str:card_id>/', credit_card.FundCreditCardApi.as_view(), name="fund-credit-card-api"),
+    path('withdraw-fund-api/<str:card_id>/', credit_card.WithdrawFundApi.as_view(), name='withdraw-fund-api'),
+    path('delete-card-api/<str:card_id>/', credit_card.DeleteCardApi.as_view(), name='delete-card-api'),
+
+    # ---------- Retrait especes au guichet ---------
+    path("withdrawals-api/", withdrawal.WithdrawalListCreateApi.as_view(), name="withdrawals-api"),
+    path("withdrawal-api/<str:code>/", withdrawal.WithdrawalDetailApi.as_view(), name="withdrawal-api"),
+    path("withdrawal-cancel-api/<str:code>/", withdrawal.WithdrawalCancelApi.as_view(), name="withdrawal-cancel-api"),
+    path("withdrawals-pending-api/", withdrawal.PendingWithdrawalsApi.as_view(), name="withdrawals-pending-api"),
+    path("withdrawal-validate-api/<str:code>/", withdrawal.WithdrawalValidateApi.as_view(), name="withdrawal-validate-api"),
+
+    # ---------- Paiement de services partenaires (Agharina) ---------
+    path("agharina-biens-api/", services.AgharinaBienListApi.as_view(), name="agharina-biens-api"),
+    path("agharina-bien-api/<str:reference>/", services.AgharinaBienDetailApi.as_view(), name="agharina-bien-api"),
+    path("agharina-pay-api/<str:reference>/", services.AgharinaPayApi.as_view(), name="agharina-pay-api"),
+    path("service-payments-api/", services.ServicePaymentListApi.as_view(), name="service-payments-api"),
+    path("service-payment-api/<str:payment_id>/", services.ServicePaymentDetailApi.as_view(), name="service-payment-api"),
+]
+
+
+# ---------------------------------------------------------------------------
+# Ancien site HTML (accueil marketing, formulaires de virement, cartes...).
+#
+# Il n'est servi que si SERVE_LEGACY_SITE est actif. En production il reste
+# eteint : une page d'accueil promettant des transferts d'argent, assortie
+# de formulaires de mot de passe et de carte bancaire sur un domaine sans
+# reputation, fait classer le site comme hameconnage par Google Safe Browsing.
+# L'interface utilisateur est desormais le frontend React.
+# ---------------------------------------------------------------------------
+site_patterns = [
     path("", views.index, name="index"),
 
     # -------------- Transfers ----------
@@ -15,72 +80,36 @@ urlpatterns = [
     path("transfer-process/<account_number>/<transaction_id>/", transfer.TransferProcess, name="transfer-process"),
     path("transfer-completed/<account_number>/<transaction_id>/", transfer.TransferCompleted, name="transfer-completed"),
 
-    # ---------- Transfers API ---------
-    path("search-account-api/", transfer.SearchUserAccountNumber.as_view(), name='search-account-api'),
-    path("amount-transfer-api/<str:account_number>/", transfer.AmountTransferApi.as_view(), name='amount-transfer-api'),
-    path('amount-transfer-process-api/<str:account_number>/', transfer.AmountTransferProcessApi.as_view(), name='amount-transfer-process-api'),
-    path('transfer-confirmation-api/<str:account_number>/<str:transaction_id>/', transfer.TransferConfirmationApi.as_view(), name='transfer-confirmation-api'),
-    path('transfer-process-api/<str:account_number>/<str:transaction_id>/', transfer.TransferProcessApi.as_view(), name='transfer-process-api'),
-    path('transfer-completed-api/<str:account_number>/<str:transaction_id>/', transfer.TransferCompletedApi.as_view(), name='transfer-completed-api'),
-    
     # -------- transactions ------------
     path("transactions/", transaction.transaction_lists, name="transactions"),
     path("transaction-detail/<transaction_id>/", transaction.transaction_detail, name="transaction-detail"),
-    # ---------- transactions API ---------
-    path('transactions-api/', transaction.TransactionListApi.as_view(), name='transaction-api'),
-    path('transaction-detail-api/<str:transaction_id>/', transaction.TransactionDetailApi.as_view(), name='transaction-detail-api'),
 
-    # -------- Payment Request
+    # -------- Payment Request ---------
     path("request-search-account/", payment_request.SearchUsersRequest, name="request-search-account"),
     path("amount-request/<account_number>/", payment_request.AmountRequest, name="amount-request"),
     path("amount-request-process/<account_number>/", payment_request.AmountRequestProcess, name="amount-request-process"),
     path("amount-request-confirmation/<account_number>/<transaction_id>/", payment_request.AmountRequestConfirmation, name="amount-request-confirmation"),
     path("amount-request-final-process/<account_number>/<transaction_id>/", payment_request.AmountRequestFinalProcess, name="amount-request-final-process"),
     path("amount-request-completed/<account_number>/<transaction_id>/", payment_request.RequestCompleted, name="amount-request-completed"),
-    # ---------- Payment API ---------
-    path("request-search-account-api/", payment_request.SearchUsersRequestApi.as_view(), name="request-search-account-api"),
-    path('amount-request-api/<str:account_number>/', payment_request.AmountRequestApi.as_view(), name='amount-request-api'),
-    path('amount-request-process-api/<str:account_number>/', payment_request.AmountRequestProcessApi.as_view(), name='amount-request-process-api'),
-    path('amount-request-confirmation-api/<str:account_number>/<str:transaction_id>/', payment_request.AmountRequestConfirmationApi.as_view(), name='amount-request-confirmation-api'),
-    path('amount-request-final-process-api/<str:account_number>/<str:transaction_id>/', payment_request.AmountRequestFinalProcessApi.as_view(), name='amount-request-final-process-api'),
-    path('request-completed-api/<str:account_number>/<str:transaction_id>/', payment_request.RequestCompletedApi.as_view(), name='request-completed-api'),
 
     # --------- Request Settlement --------
     path("settlement-confirmation/<account_number>/<transaction_id>/", payment_request.settlement_confirmation, name="settlement-confirmation"),
     path("settlement-processing/<account_number>/<transaction_id>/", payment_request.settlement_processing, name="settlement-processing"),
     path("settlement-completed/<account_number>/<transaction_id>/", payment_request.SettlementCompleted, name="settlement-completed"),
     path("delete-request/<account_number>/<transaction_id>/", payment_request.deletepaymentrequest, name="delete-request"),
-    #------- api urls ---------------
-    path('settlement-confirmation-api/<str:account_number>/<str:transaction_id>/', payment_request.SettlementConfirmationApi.as_view(), name='settlement-confirmation-api'),
-    path('settlement-processing-api/<str:account_number>/<str:transaction_id>/', payment_request.SettlementProcessingApi.as_view(), name='settlement-processing-api'),
-    path('settlement-completed-api/<str:account_number>/<str:transaction_id>/', payment_request.SettlementCompletedApi.as_view(), name='settlement-completed-api'),
-    path('delete-payment-request-api/<str:account_number>/<str:transaction_id>/', payment_request.DeletePaymentRequestApi.as_view(), name='delete-payment-request-api'),
-    # ------- Credit Card URLS --------
+
+    # ------- Credit Card --------
     path("card/<card_id>/", credit_card.card_detail, name="card-detail"),
     path("fund-credit-card/<card_id>/", credit_card.fund_credit_card, name="fund-credit-card"),
     path("withdraw_fund/<card_id>/", credit_card.withdraw_fund, name="withdraw_fund"),
     path("delete_card/<card_id>/", credit_card.delete_card, name="delete_card"),
-    #------- api urls ---------------
-    path('all-cards-api/', credit_card.AllCardsApi.as_view(), name='all-cards-api'),
-    path('card-api/<str:card_id>/', credit_card.CardDetailApi.as_view(), name='card-api'),
-    path('fund-credit-card-api/<str:card_id>/', credit_card.FundCreditCardApi.as_view(), name="fund-credit-card-api"),
-    path('withdraw-fund-api/<str:card_id>/', credit_card.WithdrawFundApi.as_view(), name='withdraw-fund-api'),
-    path('delete-card-api/<str:card_id>/', credit_card.DeleteCardApi.as_view(), name='delete-card-api'),
-    
-    # -------- Retrait especes au guichet (API) --------
-    path("withdrawals-api/", withdrawal.WithdrawalListCreateApi.as_view(), name="withdrawals-api"),
-    path("withdrawal-api/<str:code>/", withdrawal.WithdrawalDetailApi.as_view(), name="withdrawal-api"),
-    path("withdrawal-cancel-api/<str:code>/", withdrawal.WithdrawalCancelApi.as_view(), name="withdrawal-cancel-api"),
-    path("withdrawals-pending-api/", withdrawal.PendingWithdrawalsApi.as_view(), name="withdrawals-pending-api"),
-    path("withdrawal-validate-api/<str:code>/", withdrawal.WithdrawalValidateApi.as_view(), name="withdrawal-validate-api"),
-
-    # -------- Paiement de services partenaires (Agharina) --------
-    path("agharina-biens-api/", services.AgharinaBienListApi.as_view(), name="agharina-biens-api"),
-    path("agharina-bien-api/<str:reference>/", services.AgharinaBienDetailApi.as_view(), name="agharina-bien-api"),
-    path("agharina-pay-api/<str:reference>/", services.AgharinaPayApi.as_view(), name="agharina-pay-api"),
-    path("service-payments-api/", services.ServicePaymentListApi.as_view(), name="service-payments-api"),
-    path("service-payment-api/<str:payment_id>/", services.ServicePaymentDetailApi.as_view(), name="service-payment-api"),
 
     # -------------- deposite ----------
     path("deposit_1/", deposit.deposit_1, name="deposit_1"),
 ]
+
+
+urlpatterns = list(api_patterns)
+
+if settings.SERVE_LEGACY_SITE:
+    urlpatterns += site_patterns

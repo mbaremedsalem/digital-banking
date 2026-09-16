@@ -45,6 +45,7 @@ cd frontend && npm install && npm run dev
 | `DATABASE_URL` | connexion PostgreSQL | absent ⇒ SQLite locale |
 | `CORS_ALLOWED_ORIGINS` | origines autorisées du frontend | fronts locaux Vite |
 | `CSRF_TRUSTED_ORIGINS` | origines de confiance CSRF | fronts locaux Vite |
+| `SERVE_LEGACY_SITE` | sert l'ancien site HTML (accueil, connexion, dashboard) | `True` en local, `False` en production |
 | `AGHARINA_API_URL` | API immobilière partenaire | `https://admin-akarina.akarina.shop/api/biens` |
 | `SERVICE_TAX_RATE` | taxe de service | `0.02` (2 %) |
 | `AGHARINA_ACCOUNT_NUMBER` | compte recevant le prix des biens | — |
@@ -106,6 +107,24 @@ python manage.py migrate --no-input
 ```
 
 Les fichiers statiques sont servis par **WhiteNoise** — aucun service externe requis.
+
+### Pages HTML et filtres anti-hameçonnage
+
+En production, `SERVE_LEGACY_SITE` vaut `False` : l'ancien site HTML (page
+d'accueil marketing, `/user/sign-in/`, `/account/dashboard/`, formulaires de
+virement et de carte) n'est **pas** servi, et la racine affiche une page
+technique sobre listant l'API et l'admin.
+
+C'est délibéré. Une page d'accueil promettant des transferts d'argent, assortie
+de formulaires de mot de passe, de carte bancaire et de code PIN, hébergée sur un
+sous-domaine gratuit sans réputation, correspond exactement au profil qu'un
+navigateur classe comme site d'hameçonnage — Chrome affiche alors
+« Dangerous site » et bloque l'accès.
+
+L'interface destinée aux clients est le frontend React. L'administration Django
+(`/admin/`) et l'ensemble des endpoints REST restent évidemment accessibles.
+
+Pour réactiver l'ancien site malgré tout : `SERVE_LEGACY_SITE=True`.
 
 ### Points d'attention
 

@@ -42,6 +42,13 @@ DEBUG = env_bool("DJANGO_DEBUG", True if os.environ.get("RENDER") is None else F
 
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,.onrender.com")
 
+# Ancien site HTML (accueil marketing, connexion, tableau de bord Django).
+# Actif en developpement, eteint en production : sur un domaine sans reputation,
+# une page d'accueil de banque en ligne avec formulaires de mot de passe et de
+# carte bancaire declenche les filtres anti-hameconnage des navigateurs.
+# L'interface client est le frontend React.
+SERVE_LEGACY_SITE = env_bool("SERVE_LEGACY_SITE", DEBUG)
+
 # Render expose le hostname public du service dans cette variable.
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
@@ -164,9 +171,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-LOGIN_URL = "userauths:sign-in"
-# LOGIN_REDIRECT_URL = "userauths:sign-in"
-LOGOUT_REDIRECT_URL = "userauths:sign-in"
+# Sans l'ancien site, la page de connexion HTML n'existe plus : on renvoie
+# vers l'administration pour que reverse() reste valide.
+if SERVE_LEGACY_SITE:
+    LOGIN_URL = "userauths:sign-in"
+    LOGOUT_REDIRECT_URL = "userauths:sign-in"
+else:
+    LOGIN_URL = "/admin/login/"
+    LOGOUT_REDIRECT_URL = "/admin/login/"
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]

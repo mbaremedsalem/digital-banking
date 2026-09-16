@@ -1,13 +1,20 @@
+from django.conf import settings
 from django.urls import path
 from .views import *
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 app_name = "userauths"
-urlpatterns = [
-    path("sign-up",RegisterView,name="sign-up"),
+
+# Pages HTML de connexion/inscription : servies uniquement si l'ancien site
+# est actif (voir SERVE_LEGACY_SITE dans les reglages).
+site_patterns = [
+    path("sign-up", RegisterView, name="sign-up"),
     path("sign-in/", LoginView, name="sign-in"),
     path("sign-out/", logoutView, name="sign-out"),
-    #------ api rest framwork -----
+]
+
+urlpatterns = [
+    # ------ API REST ------
     path("login/", MyLoginView.as_view(), name='api_login'),
     path('register/', MyRegisterView.as_view(), name='register'),
     path('logout/', MyLogoutView.as_view(), name='logout'),
@@ -17,3 +24,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]
+
+if settings.SERVE_LEGACY_SITE:
+    urlpatterns += site_patterns
